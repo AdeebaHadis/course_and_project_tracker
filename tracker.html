@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course & Project Tracker</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            background: linear-gradient(90deg, #60a5fa 0%, #818cf8 50%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            filter: drop-shadow(0 0 20px rgba(96, 165, 250, 0.2));
+        }
+
+        .stats {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .sections {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .section {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #60a5fa 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .section-count {
+            background: rgba(96, 165, 250, 0.2);
+            color: #60a5fa;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .add-form input, .add-form select {
+            padding: 10px;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            border-radius: 8px;
+            font-size: 1em;
+            background: rgba(15, 23, 42, 0.5);
+            color: #dbeafe;
+        }
+
+        .add-form input::placeholder {
+            color: rgba(96, 165, 250, 0.5);
+        }
+
+        .add-form input {
+            flex: 1;
+        }
+
+        .add-form select {
+            width: 120px;
+        }
+
+        .add-form button {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .add-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+        }
+
+        .items-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .item {
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 15px;
+            border-left: 3px solid #3b82f6;
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.2);
+            border-color: rgba(96, 165, 250, 0.4);
+        }
+
+        .item.course {
+            border-left-color: #3b82f6;
+        }
+
+        .item.project {
+            border-left-color: #8b5cf6;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .item-name {
+            font-weight: bold;
+            font-size: 1.1em;
+            color: #dbeafe;
+        }
+
+        .item-type {
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            color: white;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .item.project .item-type {
+            background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+        }
+
+        .item-time {
+            font-size: 1.3em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #60a5fa 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .item-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-start {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-start:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-stop {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-stop:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-move {
+            background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+            color: white;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-move:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-delete {
+            background: rgba(30, 41, 59, 0.5);
+            color: #93c5fd;
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .btn-delete:hover {
+            background: rgba(30, 41, 59, 0.7);
+            border-color: rgba(96, 165, 250, 0.5);
+        }
+
+        .timer-running {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: rgba(96, 165, 250, 0.5);
+        }
+
+        .global-timer {
+            background: rgba(30, 27, 75, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .timer-display {
+            font-size: 4em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #8b5cf6 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 0.05em;
+            margin-bottom: 20px;
+        }
+
+        .timer-controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .timer-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s;
+            color: white;
+        }
+
+        .timer-btn-start {
+            background: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .timer-btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        .timer-btn-pause {
+            background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+        }
+
+        .timer-btn-pause:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .timer-btn-stop {
+            background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .timer-btn-stop:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .timer-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .timer-running-indicator {
+            animation: none;
+        }
+
+        .empty-state-icon {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .sections {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+        }
+
+        /* Streak Counter */
+        .streak-section {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .streak-display {
+            font-size: 3em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #f59e0b 0%, #ef4444 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+        }
+
+        .streak-label {
+            color: #93c5fd;
+            font-size: 1.1em;
+        }
+
+        .streak-emoji {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        /* Analytics Section */
+        .analytics-section {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .analytics-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #60a5fa 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-box {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .chart-title {
+            color: #dbeafe;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.1em;
+        }
+
+        .category-bar {
+            margin-bottom: 12px;
+        }
+
+        .category-label {
+            color: #93c5fd;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .progress-bar {
+            background: rgba(30, 41, 59, 0.5);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6 0%, #6366f1 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-fill.project {
+            background: linear-gradient(90deg, #8b5cf6 0%, #a78bfa 100%);
+        }
+
+        /* Calendar View */
+        .calendar-section {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            background: linear-gradient(90deg, #60a5fa 0%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .calendar-nav {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calendar-nav button {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+            color: #60a5fa;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .calendar-nav button:hover {
+            background: rgba(59, 130, 246, 0.3);
+            border-color: rgba(96, 165, 250, 0.5);
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .calendar-day-header {
+            text-align: center;
+            color: #60a5fa;
+            font-weight: bold;
+            padding: 10px 5px;
+            font-size: 0.9em;
+        }
+
+        .calendar-day {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid rgba(96, 165, 250, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            min-height: 80px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calendar-day:hover {
+            border-color: rgba(96, 165, 250, 0.4);
+            background: rgba(15, 23, 42, 0.7);
+        }
+
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+
+        .calendar-day.today {
+            border: 2px solid #60a5fa;
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .calendar-day.has-activity {
+            background: rgba(59, 130, 246, 0.15);
+        }
+
+        .day-number {
+            color: #dbeafe;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+        }
+
+        .day-time {
+            color: #60a5fa;
+            font-size: 0.75em;
+            font-weight: bold;
+        }
+
+        .day-items {
+            margin-top: 5px;
+            font-size: 0.7em;
+            color: #93c5fd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📚 Course & Project Tracker</h1>
+
+        <div class="global-timer">
+            <div class="timer-display" id="globalTimerDisplay">00:00:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn timer-btn-start" id="timerStartBtn" onclick="startGlobalTimer()">▶ Start</button>
+                <button class="timer-btn timer-btn-pause" id="timerPauseBtn" onclick="pauseGlobalTimer()" disabled>⏸ Pause</button>
+                <button class="timer-btn timer-btn-stop" id="timerStopBtn" onclick="stopGlobalTimer()" disabled>⏹ Stop</button>
+            </div>
+        </div>
+        
+        <div class="stats">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalTime">0h 0m</div>
+                    <div class="stat-label">Total Time Tracked</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="activeCount">0</div>
+                    <div class="stat-label">Active Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="completedCount">0</div>
+                    <div class="stat-label">Completed Items</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="wishlistCount">0</div>
+                    <div class="stat-label">In Wishlist</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="streak-section">
+            <div class="streak-emoji">🔥</div>
+            <div class="streak-display" id="streakDisplay">0</div>
+            <div class="streak-label">Day Streak</div>
+        </div>
+
+        <div class="analytics-section">
+            <div class="analytics-title">📊 Analytics</div>
+            <div class="charts-container">
+                <div class="chart-box">
+                    <div class="chart-title">Time by Category</div>
+                    <div id="categoryChart"></div>
+                </div>
+                <div class="chart-box">
+                    <div class="chart-title">Last 7 Days</div>
+                    <div id="weekChart"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="calendar-section">
+            <div class="calendar-header">
+                <div class="calendar-title">📅 Activity Calendar</div>
+                <div class="calendar-nav">
+                    <button onclick="previousMonth()">← Prev</button>
+                    <span id="currentMonth" style="color: #dbeafe; font-weight: bold; padding: 0 15px;"></span>
+                    <button onclick="nextMonth()">Next →</button>
+                </div>
+            </div>
+            <div class="calendar-grid" id="calendarGrid"></div>
+        </div>
+
+        <div class="sections">
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-title">✨ Wishlist</span>
+                    <span class="section-count" id="wishlistCountBadge">0</span>
+                </div>
+                <div class="add-form">
+                    <input type="text" id="wishlistName" placeholder="Add to wishlist...">
+                    <input type="url" id="wishlistUrl" placeholder="URL (optional)" style="flex: 0.8;">
+                    <select id="wishlistType">
+                        <option value="course">Course</option>
+                        <option value="project">Project</option>
+                    </select>
+                    <button onclick="addItem('wishlist')">Add</button>
+                </div>
+                <div class="items-list" id="wishlistItems"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-title">🔥 Active</span>
+                    <span class="section-count" id="activeCountBadge">0</span>
+                </div>
+                <div class="items-list" id="activeItems"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-title">✅ Completed</span>
+                    <span class="section-count" id="completedCountBadge">0</span>
+                </div>
+                <div class="items-list" id="completedItems"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let data = {
+            wishlist: [],
+            active: [],
+            completed: [],
+            activityLog: {} // { "2024-02-01": { courses: ["item1"], projects: ["item2"], totalTime: 3600 } }
+        };
+
+        let timers = {};
+        let timerIntervals = {};
+
+        // Global timer state
+        let globalTimerSeconds = 0;
+        let globalTimerInterval = null;
+        let globalTimerRunning = false;
+        let globalTimerPaused = false;
+
+        // Calendar state
+        let currentCalendarMonth = new Date();
+
+        // Load data from localStorage
+        function loadData() {
+            const saved = localStorage.getItem('courseProjectTracker');
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                data = {
+                    wishlist: parsed.wishlist || [],
+                    active: parsed.active || [],
+                    completed: parsed.completed || [],
+                    activityLog: parsed.activityLog || {}
+                };
+            }
+            const savedTimer = localStorage.getItem('globalTimerSeconds');
+            if (savedTimer) {
+                globalTimerSeconds = parseInt(savedTimer);
+                updateGlobalTimerDisplay();
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('courseProjectTracker', JSON.stringify(data));
+            localStorage.setItem('globalTimerSeconds', globalTimerSeconds.toString());
+        }
+
+        // Log activity for today
+        function logActivity(itemName, itemType, secondsSpent) {
+            const today = new Date().toISOString().split('T')[0];
+            if (!data.activityLog[today]) {
+                data.activityLog[today] = { courses: [], projects: [], totalTime: 0 };
+            }
+            
+            const categoryKey = itemType === 'course' ? 'courses' : 'projects';
+            if (!data.activityLog[today][categoryKey].includes(itemName)) {
+                data.activityLog[today][categoryKey].push(itemName);
+            }
+            
+            data.activityLog[today].totalTime += secondsSpent;
+            saveData();
+        }
+
+        // Global Timer Functions
+        function startGlobalTimer() {
+            if (!globalTimerRunning) {
+                globalTimerRunning = true;
+                globalTimerPaused = false;
+                
+                const startSeconds = globalTimerSeconds;
+                
+                globalTimerInterval = setInterval(() => {
+                    globalTimerSeconds++;
+                    updateGlobalTimerDisplay();
+                    saveData();
+                    updateStats();
+                }, 1000);
+
+                document.getElementById('timerStartBtn').disabled = true;
+                document.getElementById('timerPauseBtn').disabled = false;
+                document.getElementById('timerStopBtn').disabled = false;
+                document.getElementById('globalTimerDisplay').classList.add('timer-running-indicator');
+            }
+        }
+
+        function pauseGlobalTimer() {
+            if (globalTimerRunning && !globalTimerPaused) {
+                clearInterval(globalTimerInterval);
+                globalTimerPaused = true;
+                globalTimerRunning = false;
+                
+                document.getElementById('timerStartBtn').disabled = false;
+                document.getElementById('timerPauseBtn').disabled = true;
+                document.getElementById('globalTimerDisplay').classList.remove('timer-running-indicator');
+                
+                saveData();
+            }
+        }
+
+        function stopGlobalTimer() {
+            if (globalTimerRunning || globalTimerPaused) {
+                clearInterval(globalTimerInterval);
+                
+                // Log the session BEFORE resetting
+                if (globalTimerSeconds > 0) {
+                    logActivity('General Session', 'course', globalTimerSeconds);
+                }
+                
+                globalTimerRunning = false;
+                globalTimerPaused = false;
+                
+                // Reset timer display
+                globalTimerSeconds = 0;
+                updateGlobalTimerDisplay();
+                
+                document.getElementById('timerStartBtn').disabled = false;
+                document.getElementById('timerPauseBtn').disabled = true;
+                document.getElementById('timerStopBtn').disabled = true;
+                document.getElementById('globalTimerDisplay').classList.remove('timer-running-indicator');
+                
+                saveData();
+                updateStats();
+                updateStreak();
+                renderAnalytics();
+                renderCalendar();
+            }
+        }
+
+        function updateGlobalTimerDisplay() {
+            const hours = Math.floor(globalTimerSeconds / 3600);
+            const minutes = Math.floor((globalTimerSeconds % 3600) / 60);
+            const seconds = globalTimerSeconds % 60;
+            
+            const timeString = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+            document.getElementById('globalTimerDisplay').textContent = timeString;
+        }
+
+        // Format time in hours and minutes
+        function formatTime(seconds) {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            return `${hours}h ${minutes}m`;
+        }
+
+        // Add new item
+        function addItem(section) {
+            const nameInput = document.getElementById(`${section}Name`);
+            const typeSelect = document.getElementById(`${section}Type`);
+            const name = nameInput.value.trim();
+            
+            if (!name) return;
+
+            const item = {
+                id: Date.now(),
+                name: name,
+                type: typeSelect.value,
+                timeSpent: 0,
+                dateAdded: new Date().toISOString()
+            };
+
+            // Add URL if it's from wishlist and URL is provided
+            if (section === 'wishlist') {
+                const urlInput = document.getElementById('wishlistUrl');
+                const url = urlInput.value.trim();
+                if (url) {
+                    item.url = url;
+                }
+                urlInput.value = '';
+            }
+
+            data[section].push(item);
+            nameInput.value = '';
+            saveData();
+            render();
+        }
+
+        // Move item between sections
+        function moveItem(id, fromSection, toSection) {
+            const itemIndex = data[fromSection].findIndex(item => item.id === id);
+            if (itemIndex === -1) return;
+
+            const item = data[fromSection][itemIndex];
+            
+            // Stop timer if moving from active
+            if (fromSection === 'active' && timerIntervals[id]) {
+                stopTimer(id);
+            }
+
+            data[fromSection].splice(itemIndex, 1);
+            
+            if (toSection === 'completed') {
+                item.dateCompleted = new Date().toISOString();
+            }
+            
+            data[toSection].push(item);
+            saveData();
+            render();
+        }
+
+        // Delete item
+        function deleteItem(id, section) {
+            if (timerIntervals[id]) {
+                stopTimer(id);
+            }
+            data[section] = data[section].filter(item => item.id !== id);
+            saveData();
+            render();
+        }
+
+        // Start timer
+        function startTimer(id) {
+            if (timerIntervals[id]) return; // Already running
+
+            const item = data.active.find(item => item.id === id);
+            if (!item) return;
+
+            timerIntervals[id] = setInterval(() => {
+                item.timeSpent++;
+                saveData();
+                updateItemTime(id, item.timeSpent);
+                updateStats();
+            }, 1000);
+
+            render();
+        }
+
+        // Stop timer
+        function stopTimer(id) {
+            if (timerIntervals[id]) {
+                clearInterval(timerIntervals[id]);
+                delete timerIntervals[id];
+                
+                const item = data.active.find(item => item.id === id);
+                if (item) {
+                    logActivity(item.name, item.type, 1); // Log that we worked on this item
+                }
+                
+                saveData();
+                render();
+                updateStreak();
+                renderAnalytics();
+                renderCalendar();
+            }
+        }
+
+        // Update item time display
+        function updateItemTime(id, timeSpent) {
+            const timeElement = document.querySelector(`[data-item-id="${id}"] .item-time`);
+            if (timeElement) {
+                timeElement.textContent = formatTime(timeSpent);
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const itemsTime = [...data.active, ...data.completed].reduce((sum, item) => sum + item.timeSpent, 0);
+            
+            // Add all logged activity time
+            const loggedTime = Object.values(data.activityLog).reduce((sum, day) => sum + (day.totalTime || 0), 0);
+            
+            const totalTime = itemsTime + loggedTime;
+            document.getElementById('totalTime').textContent = formatTime(totalTime);
+            document.getElementById('activeCount').textContent = data.active.length;
+            document.getElementById('completedCount').textContent = data.completed.length;
+            document.getElementById('wishlistCount').textContent = data.wishlist.length;
+            
+            document.getElementById('activeCountBadge').textContent = data.active.length;
+            document.getElementById('completedCountBadge').textContent = data.completed.length;
+            document.getElementById('wishlistCountBadge').textContent = data.wishlist.length;
+        }
+
+        // Render item
+        function renderItem(item, section) {
+            const isRunning = timerIntervals[item.id] !== undefined;
+            
+            let controls = '';
+            if (section === 'wishlist') {
+                controls = `
+                    <button class="btn btn-move" onclick="moveItem(${item.id}, 'wishlist', 'active')">Start Working</button>
+                    <button class="btn btn-delete" onclick="deleteItem(${item.id}, 'wishlist')">Delete</button>
+                `;
+            } else if (section === 'active') {
+                controls = `
+                    ${isRunning ? 
+                        `<button class="btn btn-stop timer-running" onclick="stopTimer(${item.id})">⏸ Stop Timer</button>` :
+                        `<button class="btn btn-start" onclick="startTimer(${item.id})">▶ Start Timer</button>`
+                    }
+                    <button class="btn btn-move" onclick="moveItem(${item.id}, 'active', 'completed')">Mark Complete</button>
+                    <button class="btn btn-delete" onclick="deleteItem(${item.id}, 'active')">Delete</button>
+                `;
+            } else if (section === 'completed') {
+                controls = `
+                    <button class="btn btn-move" onclick="moveItem(${item.id}, 'completed', 'active')">Reopen</button>
+                    <button class="btn btn-delete" onclick="deleteItem(${item.id}, 'completed')">Delete</button>
+                `;
+            }
+
+            const urlLink = item.url ? `<div style="margin-top: 8px;"><a href="${item.url}" target="_blank" style="color: #60a5fa; text-decoration: none; font-size: 0.9em; opacity: 0.8;">🔗 ${item.url}</a></div>` : '';
+
+            return `
+                <div class="item ${item.type}" data-item-id="${item.id}">
+                    <div class="item-header">
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-type">${item.type}</span>
+                    </div>
+                    ${urlLink}
+                    ${section !== 'wishlist' ? `<div class="item-time">${formatTime(item.timeSpent)}</div>` : ''}
+                    <div class="item-controls">
+                        ${controls}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render all items
+        function render() {
+            ['wishlist', 'active', 'completed'].forEach(section => {
+                const container = document.getElementById(`${section}Items`);
+                if (data[section].length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">${section === 'wishlist' ? '💭' : section === 'active' ? '📝' : '🎉'}</div>
+                            <div>No items yet</div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = data[section].map(item => renderItem(item, section)).join('');
+                }
+            });
+
+            updateStats();
+        }
+
+        // Handle Enter key in input
+        document.getElementById('wishlistName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addItem('wishlist');
+            }
+        });
+
+        // Initialize
+        loadData();
+        render();
+        updateStreak();
+        renderAnalytics();
+        renderCalendar();
+
+        // Streak Counter
+        function updateStreak() {
+            let streak = 0;
+            const today = new Date();
+            let checkDate = new Date(today);
+            
+            while (true) {
+                const dateStr = checkDate.toISOString().split('T')[0];
+                if (data.activityLog[dateStr] && data.activityLog[dateStr].totalTime > 0) {
+                    streak++;
+                    checkDate.setDate(checkDate.getDate() - 1);
+                } else {
+                    break;
+                }
+            }
+            
+            document.getElementById('streakDisplay').textContent = streak;
+        }
+
+        // Analytics Rendering
+        function renderAnalytics() {
+            // Category Chart
+            const courseTime = [...data.active, ...data.completed]
+                .filter(item => item.type === 'course')
+                .reduce((sum, item) => sum + item.timeSpent, 0);
+            
+            const projectTime = [...data.active, ...data.completed]
+                .filter(item => item.type === 'project')
+                .reduce((sum, item) => sum + item.timeSpent, 0);
+            
+            const total = courseTime + projectTime || 1;
+            
+            const categoryHTML = `
+                <div class="category-bar">
+                    <div class="category-label">
+                        <span>📚 Courses</span>
+                        <span>${formatTime(courseTime)}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(courseTime / total) * 100}%"></div>
+                    </div>
+                </div>
+                <div class="category-bar">
+                    <div class="category-label">
+                        <span>🚀 Projects</span>
+                        <span>${formatTime(projectTime)}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill project" style="width: ${(projectTime / total) * 100}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('categoryChart').innerHTML = categoryHTML;
+            
+            // Last 7 Days Chart
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                const time = data.activityLog[dateStr]?.totalTime || 0;
+                last7Days.push({ day: dayName, time, date: dateStr });
+            }
+            
+            const maxTime = Math.max(...last7Days.map(d => d.time), 1);
+            
+            const weekHTML = last7Days.map(d => `
+                <div class="category-bar">
+                    <div class="category-label">
+                        <span>${d.day}</span>
+                        <span>${formatTime(d.time)}</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${(d.time / maxTime) * 100}%"></div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('weekChart').innerHTML = weekHTML;
+        }
+
+        // Calendar Rendering
+        function renderCalendar() {
+            const year = currentCalendarMonth.getFullYear();
+            const month = currentCalendarMonth.getMonth();
+            
+            document.getElementById('currentMonth').textContent = 
+                currentCalendarMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            let html = days.map(day => `<div class="calendar-day-header">${day}</div>`).join('');
+            
+            const today = new Date().toDateString();
+            let currentDate = new Date(startDate);
+            
+            for (let i = 0; i < 42; i++) {
+                const dateStr = currentDate.toISOString().split('T')[0];
+                const activity = data.activityLog[dateStr];
+                const isToday = currentDate.toDateString() === today;
+                const isCurrentMonth = currentDate.getMonth() === month;
+                const hasActivity = activity && activity.totalTime > 0;
+                
+                let classes = ['calendar-day'];
+                if (!isCurrentMonth) classes.push('other-month');
+                if (isToday) classes.push('today');
+                if (hasActivity) classes.push('has-activity');
+                
+                const itemsText = activity ? 
+                    [...(activity.courses || []), ...(activity.projects || [])].slice(0, 2).join(', ') : '';
+                
+                html += `
+                    <div class="${classes.join(' ')}">
+                        <div class="day-number">${currentDate.getDate()}</div>
+                        ${hasActivity ? `<div class="day-time">${formatTime(activity.totalTime)}</div>` : ''}
+                        ${itemsText ? `<div class="day-items">${itemsText}</div>` : ''}
+                    </div>
+                `;
+                
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            
+            document.getElementById('calendarGrid').innerHTML = html;
+        }
+
+        function previousMonth() {
+            currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentCalendarMonth.setMonth(currentCalendarMonth.getMonth() + 1);
+            renderCalendar();
+        }
+    </script>
+</body>
+</html>
